@@ -1,0 +1,1889 @@
+```html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Ant / Bee AI Detector</title>
+
+<style>
+:root{
+  --bg:#f6f8fb;
+  --surface:#ffffff;
+  --surface2:#f9fafb;
+  --text:#17202a;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+
+  --primary:#f59e0b;
+  --primary-dark:#d97706;
+
+  --ant:#ef4444;
+  --bee:#eab308;
+  --other:#3b82f6;
+  --unknown:#8b5cf6;
+
+  --success:#16a34a;
+  --danger:#dc2626;
+
+  --shadow:0 10px 30px rgba(15,23,42,.07);
+  --shadow-lg:0 20px 50px rgba(15,23,42,.12);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(245,158,11,.10),transparent 28%),
+    radial-gradient(circle at 90% 10%,rgba(59,130,246,.07),transparent 25%),
+    var(--bg);
+  color:var(--text);
+}
+
+button,
+input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.container{
+  width:min(1180px,calc(100% - 32px));
+  margin:auto;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+  padding:32px 0 20px;
+}
+
+.header-content{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.logo{
+  width:52px;
+  height:52px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  background:linear-gradient(135deg,#f59e0b,#f97316);
+  color:white;
+  font-size:28px;
+  box-shadow:0 10px 25px rgba(245,158,11,.28);
+}
+
+h1{
+  margin:0;
+  font-size:28px;
+  line-height:1.1;
+  letter-spacing:-.5px;
+}
+
+.subtitle{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:13px;
+  color:var(--muted);
+  box-shadow:var(--shadow);
+}
+
+.status-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--success);
+  box-shadow:0 0 0 4px rgba(22,163,74,.10);
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  padding:12px 0 20px;
+}
+
+.hero-card{
+  padding:26px;
+  border-radius:24px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+
+.pipeline{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+
+.step{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  font-size:12px;
+  font-weight:600;
+}
+
+.step-icon{
+  font-size:14px;
+}
+
+.arrow{
+  color:#9ca3af;
+  font-size:14px;
+}
+
+/* =========================
+   DROPZONE
+========================= */
+
+#drop{
+  position:relative;
+  border:2px dashed #d1d5db;
+  border-radius:20px;
+  padding:50px 20px;
+  text-align:center;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(245,158,11,.035),
+      rgba(245,158,11,.015)
+    );
+  transition:.2s ease;
+  overflow:hidden;
+}
+
+#drop:hover{
+  border-color:var(--primary);
+  transform:translateY(-1px);
+}
+
+#drop.over{
+  border-color:var(--primary);
+  background:rgba(245,158,11,.08);
+  transform:scale(1.005);
+}
+
+.upload-icon{
+  width:70px;
+  height:70px;
+  margin:0 auto 16px;
+  display:grid;
+  place-items:center;
+  border-radius:20px;
+  background:#fff7ed;
+  font-size:32px;
+}
+
+.upload-title{
+  margin:0;
+  font-size:20px;
+  font-weight:750;
+}
+
+.upload-title span{
+  color:var(--primary-dark);
+}
+
+.upload-description{
+  margin:8px auto 18px;
+  max-width:600px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.upload-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:linear-gradient(135deg,#f59e0b,#f97316);
+  color:white;
+  border:0;
+  border-radius:10px;
+  padding:11px 18px;
+  font-weight:700;
+  box-shadow:0 8px 20px rgba(245,158,11,.22);
+}
+
+.upload-btn:hover{
+  transform:translateY(-1px);
+}
+
+.file-info{
+  margin-top:15px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+
+.selection{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+button.primary,
+button.secondary{
+  border-radius:10px;
+  padding:10px 16px;
+  border:1px solid var(--border);
+  font-weight:650;
+  transition:.15s ease;
+}
+
+button.primary{
+  background:linear-gradient(135deg,#f59e0b,#f97316);
+  color:#fff;
+  border:0;
+  box-shadow:0 6px 15px rgba(245,158,11,.18);
+}
+
+button.secondary{
+  background:var(--surface);
+  color:var(--text);
+}
+
+button:hover:not(:disabled){
+  transform:translateY(-1px);
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+#msg{
+  margin:16px 0;
+  min-height:22px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+#msg.loading{
+  color:var(--primary-dark);
+}
+
+#msg.success{
+  color:var(--success);
+}
+
+#msg.err{
+  color:var(--danger);
+}
+
+/* =========================
+   SUMMARY
+========================= */
+
+.results-header{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:15px;
+  margin:30px 0 14px;
+}
+
+.results-header h2{
+  margin:0;
+  font-size:20px;
+}
+
+.results-header p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.summary-card{
+  position:relative;
+  padding:17px;
+  border-radius:16px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.summary-card::after{
+  content:"";
+  position:absolute;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  right:-25px;
+  bottom:-25px;
+  background:var(--card-color);
+  opacity:.08;
+}
+
+.summary-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.summary-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:var(--card-color);
+  color:white;
+  font-size:17px;
+}
+
+.summary-number{
+  margin-top:13px;
+  font-size:27px;
+  font-weight:800;
+}
+
+.summary-label{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:2px;
+}
+
+/* =========================
+   RESULT CARDS
+========================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fill,minmax(340px,1fr));
+  gap:18px;
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:.2s ease;
+  animation:fadeUp .35s ease both;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-lg);
+}
+
+.card-image{
+  position:relative;
+  background:#111827;
+}
+
+.card img{
+  width:100%;
+  height:250px;
+  object-fit:cover;
+  display:block;
+  cursor:zoom-in;
+}
+
+.image-label{
+  position:absolute;
+  top:12px;
+  left:12px;
+  padding:6px 9px;
+  border-radius:8px;
+  background:rgba(0,0,0,.65);
+  color:white;
+  font-size:11px;
+  backdrop-filter:blur(6px);
+}
+
+.card-body{
+  padding:15px;
+}
+
+.card-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.card h3{
+  margin:0;
+  font-size:14px;
+  word-break:break-all;
+}
+
+.insect-total{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.badges{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:11px;
+  font-weight:700;
+  background:var(--surface2);
+  border:1px solid var(--border);
+}
+
+.badge-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+}
+
+.badge.ant .badge-dot{
+  background:var(--ant);
+}
+
+.badge.bee .badge-dot{
+  background:var(--bee);
+}
+
+.badge.other .badge-dot{
+  background:var(--other);
+}
+
+.badge.unknown .badge-dot{
+  background:var(--unknown);
+}
+
+/* =========================
+   DETAILS
+========================= */
+
+details{
+  margin-top:13px;
+  border-top:1px solid var(--border);
+  padding-top:11px;
+  font-size:12px;
+}
+
+summary{
+  cursor:pointer;
+  color:var(--muted);
+  font-weight:650;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+td,
+th{
+  text-align:left;
+  padding:7px 4px;
+  border-bottom:1px solid var(--border);
+  font-size:11px;
+}
+
+th{
+  color:var(--muted);
+  font-weight:650;
+}
+
+.confidence{
+  display:inline-block;
+  width:45px;
+  height:5px;
+  margin-left:5px;
+  background:#e5e7eb;
+  border-radius:99px;
+  vertical-align:middle;
+  overflow:hidden;
+}
+
+.confidence span{
+  display:block;
+  height:100%;
+  background:var(--primary);
+  border-radius:99px;
+}
+
+/* =========================
+   ERROR CARD
+========================= */
+
+.error-card{
+  padding:18px;
+}
+
+.error-title{
+  font-weight:750;
+  margin-bottom:5px;
+}
+
+.error-text{
+  color:var(--danger);
+  font-size:13px;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty{
+  padding:55px 20px;
+  text-align:center;
+  color:var(--muted);
+  background:var(--surface);
+  border:1px dashed var(--border);
+  border-radius:18px;
+}
+
+.empty-icon{
+  font-size:40px;
+  margin-bottom:8px;
+}
+
+.empty h3{
+  color:var(--text);
+  margin:0 0 5px;
+}
+
+/* =========================
+   LIGHTBOX
+========================= */
+
+#lb{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.88);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+  padding:20px;
+}
+
+#lb img{
+  max-width:95vw;
+  max-height:90vh;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 20px 80px rgba(0,0,0,.5);
+}
+
+.close-lb{
+  position:absolute;
+  top:20px;
+  right:25px;
+  color:white;
+  font-size:30px;
+  cursor:pointer;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.spinner{
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border:2px solid rgba(245,158,11,.25);
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  vertical-align:-2px;
+  margin-right:7px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  text-align:center;
+  padding:35px 0 10px;
+  color:#9ca3af;
+  font-size:12px;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:800px){
+
+  .summary-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .header-content{
+    align-items:flex-start;
+  }
+
+  .status{
+    display:none;
+  }
+
+}
+
+@media(max-width:520px){
+
+  .container{
+    width:min(100% - 20px,1180px);
+  }
+
+  header{
+    padding-top:20px;
+  }
+
+  h1{
+    font-size:23px;
+  }
+
+  .hero-card{
+    padding:15px;
+  }
+
+  #drop{
+    padding:38px 15px;
+  }
+
+  .pipeline{
+    justify-content:flex-start;
+  }
+
+  .arrow{
+    display:none;
+  }
+
+  .summary-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .controls{
+    align-items:stretch;
+  }
+
+  .actions{
+    width:100%;
+  }
+
+  .actions button{
+    flex:1;
+  }
+
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+@media(prefers-color-scheme:dark){
+
+  :root{
+    --bg:#111315;
+    --surface:#191c1f;
+    --surface2:#202428;
+    --text:#f3f4f6;
+    --muted:#9ca3af;
+    --border:#30343a;
+
+    --shadow:0 10px 30px rgba(0,0,0,.20);
+    --shadow-lg:0 20px 50px rgba(0,0,0,.35);
+  }
+
+  body{
+    background:
+      radial-gradient(circle at 10% 0%,rgba(245,158,11,.08),transparent 28%),
+      var(--bg);
+  }
+
+  .upload-icon{
+    background:#2a2114;
+  }
+
+  #drop{
+    background:rgba(245,158,11,.025);
+  }
+
+  .confidence{
+    background:#30343a;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div class="header-content">
+
+    <div class="brand">
+      <div class="logo">🐜</div>
+
+      <div>
+        <h1>Ant / Bee AI Detector</h1>
+        <p class="subtitle">
+          Detect insects using computer vision + intelligent classification
+        </p>
+      </div>
+    </div>
+
+    <div class="status">
+      <span class="status-dot"></span>
+      AI Engine Ready
+    </div>
+
+  </div>
+</header>
+
+
+<section class="hero">
+
+<div class="hero-card">
+
+  <div class="pipeline">
+
+    <div class="step">
+      <span class="step-icon">📷</span>
+      Upload
+    </div>
+
+    <span class="arrow">→</span>
+
+    <div class="step">
+      <span class="step-icon">🎯</span>
+      Detect
+    </div>
+
+    <span class="arrow">→</span>
+
+    <div class="step">
+      <span class="step-icon">🧠</span>
+      Classify
+    </div>
+
+    <span class="arrow">→</span>
+
+    <div class="step">
+      <span class="step-icon">⚡</span>
+      Decide
+    </div>
+
+    <span class="arrow">→</span>
+
+    <div class="step">
+      <span class="step-icon">📊</span>
+      Results
+    </div>
+
+  </div>
+
+
+  <div id="drop">
+
+    <div class="upload-icon">
+      📤
+    </div>
+
+    <h2 class="upload-title">
+      Drop your images <span>here</span>
+    </h2>
+
+    <p class="upload-description">
+      Upload one or multiple insect images, or a ZIP file.
+      The AI will detect individual insects and classify them as
+      Ant, Bee, Other, or Unknown.
+    </p>
+
+    <button class="upload-btn" type="button"
+            onclick="document.querySelector('#file').click()">
+      📁 Choose Images
+    </button>
+
+    <div class="file-info" id="limits">
+      JPG, PNG, BMP, WEBP or ZIP
+    </div>
+
+    <input
+      id="file"
+      type="file"
+      multiple
+      accept="image/*,.zip,application/zip"
+      hidden
+    >
+
+  </div>
+
+
+  <div class="controls">
+
+    <div class="selection" id="sel">
+      No images selected
+    </div>
+
+    <div class="actions">
+
+      <button
+        id="go"
+        class="primary"
+        disabled>
+        🔍 Analyze Images
+      </button>
+
+      <button
+        id="clr"
+        class="secondary"
+        disabled>
+        ✕ Clear
+      </button>
+
+      <button
+        id="csv"
+        class="secondary"
+        disabled>
+        ⬇ CSV
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="msg"></div>
+
+</div>
+
+</section>
+
+
+<section id="results-section">
+
+  <div class="results-header">
+
+    <div>
+      <h2>Detection Results</h2>
+      <p id="result-description">
+        Your AI analysis will appear here.
+      </p>
+    </div>
+
+  </div>
+
+  <div
+    class="summary-grid"
+    id="sum">
+
+  </div>
+
+  <div
+    class="grid"
+    id="grid">
+
+    <div class="empty">
+
+      <div class="empty-icon">
+        🔬
+      </div>
+
+      <h3>Ready for analysis</h3>
+
+      <div>
+        Upload insect images above to begin detection.
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<footer>
+  Ant / Bee AI Detector · Computer Vision Pipeline
+</footer>
+
+</div>
+
+
+<!-- LIGHTBOX -->
+
+<div id="lb">
+
+  <span class="close-lb">×</span>
+
+  <img alt="Preview">
+
+</div>
+
+
+<script>
+
+const $ = s => document.querySelector(s);
+
+let files = [];
+let last = [];
+
+let MAX = 100;
+
+const COL = {
+  Ant: "var(--ant)",
+  Bee: "var(--bee)",
+  Other: "var(--other)",
+  Unknown: "var(--unknown)"
+};
+
+
+/* =========================
+   LOAD CONFIG
+========================= */
+
+fetch("/api/config")
+  .then(r => r.json())
+  .then(c => {
+
+    MAX = c.max_images;
+
+    $("#limits").textContent =
+      `JPG, PNG, BMP, WEBP or ZIP · up to ${MAX} images per upload`;
+
+  })
+  .catch(() => {});
+
+
+/* =========================
+   FILE INPUT
+========================= */
+
+const drop = $("#drop");
+const inp = $("#file");
+
+
+drop.addEventListener("click", e => {
+
+  if(e.target.closest("button")){
+    return;
+  }
+
+  inp.click();
+
+});
+
+
+inp.addEventListener("change", () => {
+
+  add(inp.files);
+
+});
+
+
+/* =========================
+   DRAG & DROP
+========================= */
+
+["dragenter","dragover"].forEach(event => {
+
+  drop.addEventListener(event, e => {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    drop.classList.add("over");
+
+  });
+
+});
+
+
+["dragleave","drop"].forEach(event => {
+
+  drop.addEventListener(event, e => {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    drop.classList.remove("over");
+
+  });
+
+});
+
+
+drop.addEventListener("drop", e => {
+
+  add(e.dataTransfer.files);
+
+});
+
+
+/* =========================
+   ADD FILES
+========================= */
+
+function add(list){
+
+  const incoming = [...list];
+
+  files = files.concat(incoming);
+
+  if(files.length > MAX){
+
+    files = files.slice(0, MAX);
+
+    showMessage(
+      `Maximum ${MAX} images allowed per upload.`,
+      true
+    );
+
+  }
+
+  inp.value = "";
+
+  updateUI();
+
+}
+
+
+/* =========================
+   UI UPDATE
+========================= */
+
+function updateUI(){
+
+  const count = files.length;
+
+  $("#sel").textContent =
+    count
+      ? `${count} image${count === 1 ? "" : "s"} selected`
+      : "No images selected";
+
+  $("#go").disabled = !count;
+  $("#clr").disabled = !count;
+
+}
+
+
+/* =========================
+   CLEAR
+========================= */
+
+$("#clr").onclick = () => {
+
+  files = [];
+  last = [];
+
+  updateUI();
+
+  $("#msg").textContent = "";
+
+  $("#msg").className = "";
+
+  $("#sum").innerHTML = "";
+
+  $("#grid").innerHTML = `
+    <div class="empty">
+
+      <div class="empty-icon">🔬</div>
+
+      <h3>Ready for analysis</h3>
+
+      <div>
+        Upload insect images above to begin detection.
+      </div>
+
+    </div>
+  `;
+
+  $("#result-description").textContent =
+    "Your AI analysis will appear here.";
+
+  $("#csv").disabled = true;
+
+};
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showMessage(text, error=false, loading=false){
+
+  const m = $("#msg");
+
+  m.className =
+    error
+      ? "err"
+      : loading
+        ? "loading"
+        : "success";
+
+  if(loading){
+
+    m.innerHTML =
+      `<span class="spinner"></span>${escapeHTML(text)}`;
+
+  }else{
+
+    m.textContent = text;
+
+  }
+
+}
+
+
+/* =========================
+   ANALYZE
+========================= */
+
+$("#go").onclick = async () => {
+
+  if(!files.length){
+    return;
+  }
+
+  const fd = new FormData();
+
+  files.forEach(file => {
+    fd.append("files", file);
+  });
+
+
+  $("#go").disabled = true;
+
+  showMessage(
+    "Analyzing your images…",
+    false,
+    true
+  );
+
+
+  $("#result-description").textContent =
+    "AI models are processing your images. Please wait…";
+
+
+  try{
+
+    const response = await fetch(
+      "/api/predict",
+      {
+        method:"POST",
+        body:fd
+      }
+    );
+
+
+    const data = await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error || "Analysis failed."
+      );
+
+    }
+
+
+    last = data.results || [];
+
+    render(last);
+
+
+    showMessage(
+      `Analysis complete · ${last.length} image${last.length === 1 ? "" : "s"} processed.`
+    );
+
+
+    $("#result-description").textContent =
+      `${last.length} image${last.length === 1 ? "" : "s"} analyzed by the AI pipeline.`;
+
+
+  }catch(error){
+
+    showMessage(
+      error.message || "Something went wrong.",
+      true
+    );
+
+    $("#result-description").textContent =
+      "The analysis could not be completed.";
+
+  }finally{
+
+    $("#go").disabled = !files.length;
+
+  }
+
+};
+
+
+/* =========================
+   RENDER RESULTS
+========================= */
+
+function render(results){
+
+  const totals = {
+    Ant:0,
+    Bee:0,
+    Other:0,
+    Unknown:0
+  };
+
+
+  results.forEach(result => {
+
+    if(!result.counts){
+      return;
+    }
+
+    Object.keys(totals).forEach(key => {
+
+      totals[key] +=
+        Number(result.counts[key] || 0);
+
+    });
+
+  });
+
+
+  renderSummary(totals);
+
+  renderCards(results);
+
+  $("#csv").disabled = !results.length;
+
+}
+
+
+/* =========================
+   SUMMARY
+========================= */
+
+function renderSummary(t){
+
+  const total =
+    t.Ant +
+    t.Bee +
+    t.Other +
+    t.Unknown;
+
+
+  $("#sum").innerHTML = `
+
+    ${summaryCard(
+      "🐜",
+      "Ant",
+      t.Ant,
+      "--ant",
+      "ant"
+    )}
+
+    ${summaryCard(
+      "🐝",
+      "Bee",
+      t.Bee,
+      "--bee",
+      "bee"
+    )}
+
+    ${summaryCard(
+      "🪲",
+      "Other",
+      t.Other,
+      "--other",
+      "other"
+    )}
+
+    ${summaryCard(
+      "❔",
+      "Unknown",
+      t.Unknown,
+      "--unknown",
+      "unknown"
+    )}
+
+  `;
+
+}
+
+
+function summaryCard(icon,label,value,color,className){
+
+  return `
+
+    <div
+      class="summary-card"
+      style="--card-color:var(${color})">
+
+      <div class="summary-top">
+
+        <div class="summary-icon">
+          ${icon}
+        </div>
+
+        <span class="summary-label">
+          DETECTED
+        </span>
+
+      </div>
+
+      <div class="summary-number">
+        ${value}
+      </div>
+
+      <div class="summary-label">
+        ${label}s
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   RESULT CARDS
+========================= */
+
+function renderCards(results){
+
+  if(!results.length){
+
+    $("#grid").innerHTML = `
+      <div class="empty">
+
+        <div class="empty-icon">
+          🔍
+        </div>
+
+        <h3>No results found</h3>
+
+        <div>
+          No insects were detected in the uploaded images.
+        </div>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  $("#grid").innerHTML = results.map((r,index) => {
+
+    if(r.error){
+
+      return `
+
+        <div class="card">
+
+          <div class="error-card">
+
+            <div class="error-title">
+              ⚠ ${escapeHTML(r.name)}
+            </div>
+
+            <div class="error-text">
+              ${escapeHTML(r.error)}
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    const total =
+      Object.values(r.counts || {})
+        .reduce((a,b) => a + Number(b || 0),0);
+
+
+    const badges =
+      createBadges(r.counts || {});
+
+
+    const details =
+      createDetails(r.insects || []);
+
+
+    return `
+
+      <div
+        class="card"
+        style="animation-delay:${Math.min(index * 50,500)}ms">
+
+        <div class="card-image">
+
+          <img
+            src="${escapeAttribute(r.image)}"
+            alt="Detection result for ${escapeAttribute(r.name)}">
+
+          <div class="image-label">
+            AI DETECTION
+          </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+          <div class="card-title">
+
+            <h3>
+              ${escapeHTML(r.name)}
+            </h3>
+
+            <div class="insect-total">
+              ${total} detected
+            </div>
+
+          </div>
+
+
+          <div class="badges">
+
+            ${
+              badges ||
+              `<span class="badge">
+                No insects detected
+              </span>`
+            }
+
+          </div>
+
+
+          ${details}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+
+}
+
+
+/* =========================
+   BADGES
+========================= */
+
+function createBadges(counts){
+
+  return Object.entries(counts)
+
+    .filter(([,value]) => Number(value) > 0)
+
+    .map(([key,value]) => {
+
+      const className =
+        key.toLowerCase();
+
+      const icon =
+        key === "Ant"
+          ? "🐜"
+          : key === "Bee"
+            ? "🐝"
+            : key === "Other"
+              ? "🪲"
+              : "❔";
+
+
+      return `
+
+        <span class="badge ${className}">
+
+          <span class="badge-dot"></span>
+
+          ${icon}
+          ${key}
+          <strong>${value}</strong>
+
+        </span>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================
+   DETAILS TABLE
+========================= */
+
+function createDetails(insects){
+
+  if(!insects.length){
+    return "";
+  }
+
+
+  const rows = insects.map(i => {
+
+    const detectorConf =
+      Number(i.detector?.conf || 0);
+
+    const classifierConf =
+      Number(i.classifier?.conf || 0);
+
+
+    return `
+
+      <tr title="${escapeAttribute(i.reason || "")}">
+
+        <td>
+          <strong>
+            ${escapeHTML(i.final || "Unknown")}
+          </strong>
+        </td>
+
+        <td>
+
+          ${escapeHTML(i.detector?.label || "-")}
+
+          ${confidenceBar(detectorConf)}
+
+          ${Math.round(detectorConf * 100)}%
+
+        </td>
+
+        <td>
+
+          ${escapeHTML(i.classifier?.label || "-")}
+
+          ${confidenceBar(classifierConf)}
+
+          ${Math.round(classifierConf * 100)}%
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }).join("");
+
+
+  return `
+
+    <details>
+
+      <summary>
+        🔎 View individual detections (${insects.length})
+      </summary>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Final</th>
+            <th>Detector</th>
+            <th>Classifier</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+          ${rows}
+        </tbody>
+
+      </table>
+
+    </details>
+
+  `;
+
+}
+
+
+/* =========================
+   CONFIDENCE BAR
+========================= */
+
+function confidenceBar(value){
+
+  const percentage =
+    Math.max(0,Math.min(100,value * 100));
+
+  return `
+    <span class="confidence">
+      <span style="width:${percentage}%"></span>
+    </span>
+  `;
+
+}
+
+
+/* =========================
+   CSV EXPORT
+========================= */
+
+$("#csv").onclick = () => {
+
+  const rows = [[
+    "image",
+    "final",
+    "detector_label",
+    "detector_conf",
+    "classifier_label",
+    "classifier_conf",
+    "x1",
+    "y1",
+    "x2",
+    "y2"
+  ]];
+
+
+  last.forEach(r => {
+
+    (r.insects || []).forEach(i => {
+
+      rows.push([
+        r.name,
+        i.final,
+        i.detector?.label || "",
+        i.detector?.conf ?? "",
+        i.classifier?.label || "",
+        i.classifier?.conf ?? "",
+        ...(i.box || [])
+      ]);
+
+    });
+
+  });
+
+
+  const csvContent =
+    rows
+      .map(row =>
+        row
+          .map(value =>
+            `"${String(value).replace(/"/g,'""')}"`
+          )
+          .join(",")
+      )
+      .join("\n");
+
+
+  const blob =
+    new Blob(
+      [csvContent],
+      {type:"text/csv;charset=utf-8"}
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+  a.download = "ant_bee_detection_results.csv";
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+
+};
+
+
+/* =========================
+   LIGHTBOX
+========================= */
+
+$("#grid").addEventListener("click", e => {
+
+  if(e.target.tagName === "IMG"){
+
+    $("#lb img").src =
+      e.target.src;
+
+    $("#lb").style.display =
+      "flex";
+
+  }
+
+});
+
+
+$("#lb").addEventListener("click", () => {
+
+  $("#lb").style.display =
+    "none";
+
+});
+
+
+/* =========================
+   ESCAPE HELPERS
+========================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/[&<>"]/g, char => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;"
+    })[char]);
+
+}
+
+
+function escapeAttribute(value){
+
+  return escapeHTML(value)
+    .replace(/'/g,"&#39;");
+
+}
+
+
+/* =========================
+   KEYBOARD SUPPORT
+========================= */
+
+document.addEventListener("keydown", e => {
+
+  if(e.key === "Escape"){
+
+    $("#lb").style.display =
+      "none";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
+```
